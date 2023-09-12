@@ -43,7 +43,7 @@ RUN curl -LO  https://dl.google.com/linux/direct/google-chrome-stable_current_am
 RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
 # Check chrome version
-RUN echo "Chrome: " && google-chrome --help
+RUN echo "Chrome: " && google-chrome --path
 
 # Copy the rest of the application code to the container
 COPY . .
