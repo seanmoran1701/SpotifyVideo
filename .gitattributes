@@ -1,1 +1,5 @@
 *.dll filter=lfs diff=lfs merge=lfs -text
+116.0.5845.180/chrome.dll filter=lfs diff=lfs merge=lfs -text
+.Backend//116.0.5845.180/chrome.dll filter=lfs diff=lfs merge=lfs -text
+.Backend/116.0.5845.180/chrome.dll filter=lfs diff=lfs merge=lfs -text
+Backend/116.0.5845.180/chrome.dll filter=lfs diff=lfs merge=lfs -text
