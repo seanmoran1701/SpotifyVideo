@@ -47,7 +47,6 @@ options.setChromeBinaryPath('chromedriver.exe')
 
 async function getID(search) {
     let driver = new Builder()
-        .setChromeService
         .forBrowser('chrome')
         .setChromeOptions(options)
         .build();
