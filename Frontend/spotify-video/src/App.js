@@ -195,7 +195,7 @@ function App() {
 
     return (
         <div className="App">
-            {!loggedIn && <a href={publicUrl}>Login to Spotify</a>}
+            {!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}
 
             <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
                 {loggedIn && <button onClick={() => getPlaylists()}>GET PLAYLISTS</button>}
