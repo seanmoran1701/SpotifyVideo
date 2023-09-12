@@ -16,9 +16,7 @@ COPY . .
 # Expose the port your app will run on
 EXPOSE 8888
 
-RUN apt-get install -y wget
-RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN apt-get update && apt-get install -y google-chrome-stable
 
 # Define the command to run your Node.js application
 CMD ["node", "app.js"]
