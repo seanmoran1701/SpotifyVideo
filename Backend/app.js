@@ -21,7 +21,10 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '1b4fa81586144395b6fa1ce3a8f84bc5'; // Your client id
 var client_secret = 'e9273125b63d4b57b6e72a25ce91e9f8'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+
+const localUrl = 'http://localhost:8888'
+const publicUrl = 'http://spotifyvideo-production.up.railway.app'
+var redirect_uri = publicUrl+'/callback'; // Your redirect uri
 
 const videoIds = new Map();
 
@@ -157,13 +160,13 @@ app.get('/callback', function(req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
-          res.redirect('http://localhost:3000/#' +
+          res.redirect(publicUrl+'/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
           }));
       } else {
-          res.redirect('http://localhost:3000/#' +
+          res.redirect(publicUrl+'/#' +
           querystring.stringify({
             error: 'invalid_token'
           }));
