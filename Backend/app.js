@@ -23,9 +23,9 @@ var client_id = '1b4fa81586144395b6fa1ce3a8f84bc5'; // Your client id
 var client_secret = 'e9273125b63d4b57b6e72a25ce91e9f8'; // Your secret
 
 const localUrl = 'http://localhost:8888'
-const publicUrl = 'http://spotifyvideo-production.up.railway.app'
+const publicUrl = 'http://spotifyvideo-production.up.railway.app/callback'
 const frontUrl = 'https://spotify-video.vercel.app/'
-var redirect_uri = publicUrl+'/callback'; // Your redirect uri
+var redirect_uri = publicUrl; // Your redirect uri
 
 const videoIds = new Map();
 
@@ -161,13 +161,13 @@ app.get('/callback', function(req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
-          res.redirect(frontUrl+'/#' +
+          res.redirect(frontUrl +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
           }));
       } else {
-          res.redirect(frontUrl+'/#' +
+          res.redirect(frontUrl +
           querystring.stringify({
             error: 'invalid_token'
           }));
@@ -200,5 +200,5 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(process.env.PORT || 8888);
+const port = process.env.PORT || 8888;
+app.listen(port, "0.0.0.0", () => { console.log(port) })

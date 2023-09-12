@@ -31,7 +31,7 @@ const code = params.get("code");
 };*/
 
 const localUrl = 'http://localhost:8888';
-const publicUrl = 'https://spotifyvideo-production.up.railway.app';
+const publicUrl = 'https://spotifyvideo-production.up.railway.app/';
 function App() {
     const [videoUrl, setVideoUrl] = useState([]);
     const [playlistClick, setplaylistClick] = useState(false);
@@ -195,7 +195,7 @@ function App() {
 
     return (
         <div className="App">
-            {!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}
+            {!loggedIn && <a href={publicUrl}>Login to Spotify</a>}
 
             <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
                 {loggedIn && <button onClick={() => getPlaylists()}>GET PLAYLISTS</button>}
