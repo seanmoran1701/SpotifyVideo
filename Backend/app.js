@@ -24,6 +24,7 @@ var client_secret = 'e9273125b63d4b57b6e72a25ce91e9f8'; // Your secret
 
 const localUrl = 'http://localhost:8888'
 const publicUrl = 'http://spotifyvideo-production.up.railway.app'
+const frontUrl = 'https://spotify-video.vercel.app/'
 var redirect_uri = publicUrl+'/callback'; // Your redirect uri
 
 const videoIds = new Map();
@@ -160,13 +161,13 @@ app.get('/callback', function(req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
-          res.redirect(publicUrl+'/#' +
+          res.redirect(frontUrl+'/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
           }));
       } else {
-          res.redirect(publicUrl+'/#' +
+          res.redirect(frontUrl+'/#' +
           querystring.stringify({
             error: 'invalid_token'
           }));
