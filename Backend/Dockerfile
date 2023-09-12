@@ -48,6 +48,7 @@ RUN echo "Chrome: " && whereis google-chrome
 # Copy the rest of the application code to the container
 COPY . .
 
+RUN chmod +x chromedriver.exe
 # Expose the port your app will run on
 EXPOSE 8888
 
