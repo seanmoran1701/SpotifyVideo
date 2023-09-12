@@ -12,7 +12,11 @@ from csv import writer
 
 
 q = sys.argv[1];
-driver = webdriver.Chrome()
+
+chrome_options = Options();
+chrome_options.add_argument("--headless")
+
+driver = webdriver.Chrome("chromedriver.exe", options = chrome_options)
 driver.get('https://www.youtube.com/results?search_query='+q)
 sleep(1)
 
