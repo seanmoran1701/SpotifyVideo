@@ -30,7 +30,8 @@ const code = params.get("code");
 
 };*/
 
-
+const localUrl = 'http://localhost:8888';
+const publicUrl = 'spotifyvideo-production.up.railway.app';
 function App() {
     const [videoUrl, setVideoUrl] = useState([]);
     const [playlistClick, setplaylistClick] = useState(false);
@@ -105,7 +106,7 @@ function App() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ search: searchString })
         };
-        await fetch('http://localhost:8888/setID', requestOptions)
+        await fetch(publicUrl + '/setID', requestOptions)
             .then(response => console.log(response))
             //.catch(error => console.error('Error fetching data:', error));
 
@@ -115,7 +116,7 @@ function App() {
             headers: { 'Content-Type': 'application/json' },
             
         };
-        await fetch('http://localhost:8888/getID', requestOptions)
+        await fetch(publicUrl + '/getID', requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data.id);
@@ -194,7 +195,7 @@ function App() {
 
     return (
         <div className="App">
-            {!loggedIn && <a href="http://localhost:8888">Login to Spotify</a>}
+            {!loggedIn && <a href={publicUrl}>Login to Spotify</a>}
 
             <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
                 {loggedIn && <button onClick={() => getPlaylists()}>GET PLAYLISTS</button>}
