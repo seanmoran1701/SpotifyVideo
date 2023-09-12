@@ -1,3 +1,6 @@
+ARG VERSION=latest
+FROM browserless/chrome:$VERSION
+
 # Use an official Node.js runtime as a parent image
 FROM node:14
 
@@ -15,8 +18,6 @@ COPY . .
 
 # Expose the port your app will run on
 EXPOSE 8888
-
-RUN apt-get update && apt-get install -y google-chrome-stable
 
 # Define the command to run your Node.js application
 CMD ["node", "app.js"]
