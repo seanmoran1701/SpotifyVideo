@@ -16,11 +16,7 @@ COPY . .
 # Expose the port your app will run on
 EXPOSE 8888
 
-# Define an ARG for specifying the Chrome version (default to 'latest')
-ARG VERSION=latest
 
-# Use the specified Chrome version
-FROM browserless/chrome:$VERSION
 
 # Define the command to run your Node.js application
 CMD ["node", "app.js"]
