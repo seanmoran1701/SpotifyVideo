@@ -37,6 +37,7 @@ const videoIds = new Map();
 
 const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+require('chromedriver');
 
 const options = new chrome.Options();
 options.addArguments('--disable-dev-shm-usage')
