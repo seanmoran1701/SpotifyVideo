@@ -40,12 +40,17 @@ const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 require('chromedriver');
 
+if (fs.existsSync("chromedriver.exe")) {
+    console.log('driver found');
+} else { console.log('not found');}
+
 const options = new chrome.Options();
 options.setChromeBinaryPath('chrome.exe')
 options.addArguments('--disable-dev-shm-usage')
 options.addArguments('--no-sandbox')
 options.addArguments('--headless')
-process.env.PATH += '.\node_modules\chromedriver\lib\chromedriver\chromedriver.exe';
+process.env.PATH += 'chromedriver.exe';
+
 
 async function getID(search) {
     let driver = new Builder()
