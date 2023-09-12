@@ -30,7 +30,7 @@ const code = params.get("code");
 
 };*/
 
-const localUrl = 'http://localhost:8888';
+//const publicUrl = 'http://localhost:8888';
 const publicUrl = 'https://spotifyvideo-production.up.railway.app';
 function App() {
     const [videoUrl, setVideoUrl] = useState([]);

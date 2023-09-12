@@ -22,9 +22,10 @@ var cookieParser = require('cookie-parser');
 var client_id = '1b4fa81586144395b6fa1ce3a8f84bc5'; // Your client id
 var client_secret = 'e9273125b63d4b57b6e72a25ce91e9f8'; // Your secret
 
-const localUrl = 'http://localhost:8888'
+//const publicUrl = 'http://localhost:8888/callback'
 const publicUrl = 'http://spotifyvideo-production.up.railway.app/callback'
 const frontUrl = 'https://spotify-video.vercel.app/'
+//const frontUrl = 'http://localhost:3000'
 var redirect_uri = publicUrl; // Your redirect uri
 
 const videoIds = new Map();
@@ -40,10 +41,11 @@ const chrome = require('selenium-webdriver/chrome');
 require('chromedriver');
 
 const options = new chrome.Options();
+options.setChromeBinaryPath('chrome.exe')
 options.addArguments('--disable-dev-shm-usage')
 options.addArguments('--no-sandbox')
 options.addArguments('--headless')
-options.setChromeBinaryPath('chrome.exe')
+process.env.PATH += '.\node_modules\chromedriver\lib\chromedriver\chromedriver.exe';
 
 async function getID(search) {
     let driver = new Builder()
