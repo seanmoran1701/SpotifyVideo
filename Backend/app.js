@@ -43,9 +43,11 @@ const options = new chrome.Options();
 options.addArguments('--disable-dev-shm-usage')
 options.addArguments('--no-sandbox')
 options.addArguments('--headless')
+options.setChromeBinaryPath('chromedriver.exe')
 
 async function getID(search) {
     let driver = new Builder()
+        .setChromeService
         .forBrowser('chrome')
         .setChromeOptions(options)
         .build();
