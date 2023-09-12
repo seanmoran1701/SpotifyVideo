@@ -55,11 +55,11 @@ options.addArguments('--no-sandbox')
 options.addArguments('--headless')
 //process.env.PATH += 'chromedriver.exe';
 
-//const service = new chrome.ServiceBuilder('chromedriver.exe');
+const service = new chrome.ServiceBuilder('chromedriver.exe');
 //const service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH);
 async function getID(search) {
     let driver = new Builder()
-        //.setChromeService(service)
+        .setChromeService(service)
         .forBrowser('chrome')
         .setChromeOptions(options)
         .build();
