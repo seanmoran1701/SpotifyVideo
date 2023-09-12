@@ -85,8 +85,9 @@ app.get('/getID', jsonParser, async function (req, res) {
 
             args: [search] //An argument which can be accessed in the script using sys.argv[1]
         };
-        await PythonShell.run('main.py', options, function (err) {
+        await PythonShell.run('testpy.py', options, function (err,result) {
             if (err) throw err;
+            console.log('result: ', result.toString());
             console.log('finished');
         });
         await populateMap();
