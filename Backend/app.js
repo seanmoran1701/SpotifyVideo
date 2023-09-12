@@ -36,13 +36,16 @@ const videoIds = new Map();
  * @return {string} The generated string
  */
 
-const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
-require('chromedriver');
+const { Builder, Browser, By, Key, until} = require('selenium-webdriver');
+const  chrome  = require('selenium-webdriver/chrome');
+//require('chromedriver');
 
 if (fs.existsSync("chromedriver.exe")) {
     console.log('driver found');
 } else { console.log('not found');}
+
+
+
 
 const options = new chrome.Options();
 options.setChromeBinaryPath('chrome.exe')
@@ -51,9 +54,11 @@ options.addArguments('--no-sandbox')
 options.addArguments('--headless')
 process.env.PATH += 'chromedriver.exe';
 
+const service = new chrome.ServiceBuilder('chromedriver.exe');
 
 async function getID(search) {
     let driver = new Builder()
+        .setChromeService(service)
         .forBrowser('chrome')
         .setChromeOptions(options)
         .build();
