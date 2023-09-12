@@ -34,6 +34,43 @@ const videoIds = new Map();
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
+
+const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
+
+const options = new chrome.Options();
+options.addArguments('--disable-dev-shm-usage')
+options.addArguments('--no-sandbox')
+options.addArguments('--headless')
+
+async function getID(search) {
+    let driver = new Builder()
+        .forBrowser('chrome')
+        .setChromeOptions(options)
+        .build();
+    //let driver = await new Builder().forBrowser("chrome").build();
+    await driver.get('https://www.youtube.com/results?search_query=' + search);
+    var video = await driver.findElements(By.id('video-title'));
+    var url = null;
+    let i = 0;
+    while (url == null) {
+        var url = await video[i].getAttribute("href");
+        i++;
+    }
+    var id1 = url.split('/')
+    var id2 = id1[3].split('=')
+    var id3 = id2[1]
+    var id4 = id3.split('&')
+    var id5 = id4[0]
+    console.log(id5);
+    await driver.quit();
+
+    var stream = fs.createWriteStream("videoIds.csv", { flags: 'a' });
+    stream.write(search + ',' + id5 + '\n');
+    stream.end();
+
+    return id5;
+}
 var generateRandomString = function(length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -76,25 +113,25 @@ app.post('/setID', jsonParser,function (req, res) {
 
 app.get('/getID', jsonParser, async function (req, res) {
     console.log(search);
-    
+
     if (videoIds.has(search)) {
         console.log("found in csv")
-    } else {
-        let options = {
-            mode: 'text',
 
-            args: [search] //An argument which can be accessed in the script using sys.argv[1]
-        };
-        await PythonShell.run('testpy.py', options, function (err,result) {
-            if (err) throw err;
-            console.log('result: ', result.toString());
-            console.log('finished');
+        res.send({
+            'id': videoIds.get(search)
         });
+    } else {
+
+        const id = await getID(search);
         await populateMap();
+
+        console.log(search);
+        console.log(videoIds.get(search));
+        res.send({
+            'id': id
+        });
     }
-    res.send({
-        'id': videoIds.get(search)
-    });
+
 });
 
 
