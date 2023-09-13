@@ -30,8 +30,8 @@ const code = params.get("code");
 
 };*/
 
-const publicUrl = 'http://localhost:8888';
-//const publicUrl = 'https://spotifyvideo-production.up.railway.app';
+//const publicUrl = 'http://localhost:8888';
+const publicUrl = 'https://spotifyvideo-production.up.railway.app';
 function App() {
     const [videoUrl, setVideoUrl] = useState([]);
     const [playlistClick, setplaylistClick] = useState(false);
