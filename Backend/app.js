@@ -28,6 +28,7 @@ const frontUrl = 'https://spotify-video.vercel.app/'
 //const frontUrl = 'http://localhost:3000'
 var redirect_uri = publicUrl; // Your redirect uri
 
+const youtube = require("youtube-search-api");
 const videoIds = new Map();
 
 /**
@@ -35,57 +36,22 @@ const videoIds = new Map();
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
-
-const { Builder, Browser, By, Key, until} = require('selenium-webdriver');
-const  chrome  = require('selenium-webdriver/chrome');
-require('chromedriver');
-
-if (fs.existsSync("chromedriver.exe")) {
-    console.log('driver found');
-} else { console.log('not found');}
-
-
-
-
-const options = new chrome.Options();
-//options.setChromeBinaryPath('chrome.exe')
-options.addArguments('--disable-gpu');
-options.addArguments('--disable-dev-shm-usage')
-options.addArguments('--no-sandbox')
-options.addArguments('--headless')
-//process.env.PATH += 'chromedriver.exe';
-
-const service = new chrome.ServiceBuilder('chromedriver.exe');
-//const service = new chrome.ServiceBuilder(process.env.CHROMEDRIVER_PATH);
 async function getID(search) {
-    let driver = new Builder()
-        .setChromeService(service)
-        .forBrowser('chrome')
-        .setChromeOptions(options)
-        .build();
-    //let driver = await new Builder().forBrowser("chrome").build();
-    await driver.get('https://www.youtube.com/results?search_query=' + search);
-    var video = await driver.findElements(By.id('video-title'));
-    var url = null;
-    let i = 0;
-    while (url == null) {
-        var url = await video[i].getAttribute("href");
-        i++;
-    }
-    var id1 = url.split('/')
-    var id2 = id1[3].split('=')
-    var id3 = id2[1]
-    var id4 = id3.split('&')
-    var id5 = id4[0]
-    console.log(id5);
-    await driver.quit();
+    var Id = "";
+    await youtube.GetListByKeyword(search, true, 1, [{ type: "video" }])
+        .then((res) => {
+            Id = res.items[0].id;
+            console.log(res.items[0].id);
+        })
 
     var stream = fs.createWriteStream("videoIds.csv", { flags: 'a' });
-    stream.write(search + ',' + id5 + '\n');
+    stream.write(search + ',' + Id + '\n');
     stream.end();
 
-    return id5;
+
+    return Id;
 }
+
 var generateRandomString = function(length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -140,8 +106,6 @@ app.get('/getID', jsonParser, async function (req, res) {
         const id = await getID(search);
         await populateMap();
 
-        console.log(search);
-        console.log(videoIds.get(search));
         res.send({
             'id': id
         });
