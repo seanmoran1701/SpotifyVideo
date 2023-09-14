@@ -4,8 +4,9 @@
     "\\Backend",
     "\\Frontend",
     "\\Frontend\\spotify-video",
+    "\\Frontend\\spotify-video\\public",
     "\\Frontend\\spotify-video\\src"
   ],
-  "SelectedNode": "\\Backend\\main.py",
+  "SelectedNode": "\\Backend\\app.js",
   "PreviewInSolutionExplorer": false
 }

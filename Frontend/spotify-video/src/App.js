@@ -5,8 +5,15 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Container, InputGroup, FormControl, Button, Row, Card } from 'react-bootstrap';
 import YouTube from 'react-youtube';
 import './App.css';
-//import { Container } from '@mui/material';
-//AIzaSyCjisIjQyKylG1m356fzHS_tTd4MldSmEI
+
+//component imports
+import ButtonGroup from './ButtonGroup'
+import IconButton from '@mui/material/IconButton';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import RepeatOnIcon from '@mui/icons-material/RepeatOn';
 
 const spotifyApi = new SpotifyWebApi();
 var currentVideo = 0;
@@ -16,6 +23,8 @@ var idFound = 0;
 const clientId = "1b4fa81586144395b6fa1ce3a8f84bc5";
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
+
+var targetPlayer;
 
 
 /*const getToken = () => {
@@ -30,8 +39,8 @@ const code = params.get("code");
 
 };*/
 
-//const publicUrl = 'http://localhost:8888';
-const publicUrl = 'https://spotifyvideo-production.up.railway.app';
+const publicUrl = 'http://localhost:8888';
+//const publicUrl = 'https://spotifyvideo-production.up.railway.app';
 function App() {
     const [videoUrl, setVideoUrl] = useState([]);
     const [playlistClick, setplaylistClick] = useState(false);
@@ -39,6 +48,7 @@ function App() {
     const [playlists, setPlaylists] = useState([]);
     const [songs, setSongs] = useState([]);
     const [firstLoaded, setFirstLoaded] = useState([]);
+    const [repeat, setRepeat] = useState(false);
 
     useEffect(() => {
         
@@ -61,6 +71,8 @@ function App() {
     function getPlaylists() {
         setplaylistClick(false);
         idFound = 0;
+        setRepeat(false);
+
         spotifyApi.getUserPlaylists({offset: 0, limit: 50 }).then((response) => {
             setPlaylists(response.items);
 
@@ -81,6 +93,8 @@ function App() {
     async function playListClicked(playlist) {
         currentVideo = 0;
         setplaylistClick(true);
+        setRepeat(false);
+
         var playlistSongs;
         await spotifyApi.getPlaylistTracks(playlist.id).then((response) => {
             
@@ -135,17 +149,23 @@ function App() {
 
     }, [videoUrl])
 
+    useEffect(() => {
+
+        console.log("Toggle repeat: ", repeat)
+
+    }, [repeat])
+
 
     //youtube video options
     const opts = {
         height: '648',
         width: '1152',
         playerVars: {
-
             autoplay: 1,
         }
     }
     function _onReady(event) {
+        targetPlayer = event.target;
         // If loaded video is first in play list run onEnd function
         if (isFirstVideo == 1) {
             //_onEnd();
@@ -157,13 +177,15 @@ function App() {
     //function loads the video after next. When next button clicked previously loaded video plays
     function _onEnd(event) {
         
-        //wrap around to beginning of playlist if at end, else increment
-        if (currentPlaylistSize-1 != currentVideo) {
-            currentVideo = currentVideo + 1;
-        } else { currentVideo = 0; }
-        //get current video
-        
-        getVideo(songs);
+        if (!repeat) {
+            //wrap around to beginning of playlist if at end, else increment
+            if (currentPlaylistSize - 1 != currentVideo) {
+                currentVideo = currentVideo + 1;
+            } else { currentVideo = 0; }
+
+            //get current video
+            getVideo(songs);
+        } else { targetPlayer.seekTo(0);}
         //set video id in local storage
         sessionStorage.setItem('id', videoUrl);
         
@@ -173,6 +195,25 @@ function App() {
         
         
     }
+
+    function previous(event) {
+        if (!repeat) {
+            //wrap around to beginning of playlist if at end, else increment
+            if (currentVideo > 0) {
+                currentVideo = currentVideo - 1;
+            } else { currentVideo = currentPlaylistSize - 1; }
+
+
+            //get current video
+            getVideo(songs);
+        }
+        //set video id in local storage
+        sessionStorage.setItem('id', videoUrl);
+
+        console.log('current video: ' + currentVideo);
+    }
+
+        
     function shuffle(array) {
         let currentIndex = array.length,  randomIndex;
 
@@ -189,12 +230,41 @@ function App() {
   }
 
         setSongs(array);
-}
-    
+    }
 
+    function repeatVideo() {
+        
+        if (!repeat) { setRepeat(true); }
+        else { setRepeat(false); }
+}
+//Components
+//-----------------------------------------------------------------------------
+    const videoPlayer = <YouTube videoId={videoUrl} opts={opts} onReady={_onReady} onEnd={_onEnd} />;
+    
+    
+    const buttons = [
+        <IconButton onClick={() => _onEnd()} aria-label="next" size="large">
+            <SkipNextIcon fontSize="inherit" />
+        </IconButton>,
+        <IconButton onClick={() => previous()} aria-label="prev" size="large">
+            <SkipPreviousIcon fontSize="inherit" />
+        </IconButton>,
+        <IconButton onClick={() => shuffle(songs)} aria-label="shuffle" size="large">
+            <ShuffleIcon fontSize="inherit" />
+        </IconButton>,
+        <IconButton onClick={() => repeatVideo()} aria-label="repeat" size="large">
+            {repeat ?
+                <RepeatOnIcon fontSize="inherit" />
+                :
+                <RepeatIcon fontSize="inherit" />
+            }
+
+        </IconButton>
+    ];
 
     return (
         <div className="App">
+            
             {!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}
 
             <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
@@ -223,16 +293,15 @@ function App() {
                 </Container>
             }
             {playlistClick &&
+                
                 <div style={{ position: 'absolute', right: 0, marginRight: 10, marginTop: 10 }}>
-                    <button onClick={() => _onEnd()}> NEXT </button>
-                    <div style={{ position: 'relative', marginTop: 10 }}>
-                        <button onClick={() => shuffle(songs)}> SHUFFLE </button>
-                    </div>
+                <ButtonGroup buttons={buttons} />
+                    
                 </div>
             }
             
             {playlistClick && idFound == 1 &&
-                <div style={{ position:'absolute',zIndex: -1,left: 50, right: 0, marginLeft: 'auto', marginRight: 'auto' }}>
+                <div style={{position:'absolute',zIndex: -1,left: 50, right: 0, marginLeft: 'auto', marginRight: 'auto' }}>
                 <YouTube videoId={videoUrl} opts={opts} onReady={_onReady} onEnd={_onEnd}  />
             </div>
             }
@@ -240,6 +309,9 @@ function App() {
     );
 }
 
-
+//<button onClick={() => _onEnd()}> NEXT </button>
+//   <div style={{ position: 'relative', marginTop: 10 }}>
+//         <button onClick={() => shuffle(songs)}> SHUFFLE </button>
+//   </div>
 
 export default App;
