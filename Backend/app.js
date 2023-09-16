@@ -22,20 +22,31 @@ var cookieParser = require('cookie-parser');
 var client_id = '1b4fa81586144395b6fa1ce3a8f84bc5'; // Your client id
 var client_secret = 'e9273125b63d4b57b6e72a25ce91e9f8'; // Your secret
 
+//get spotify data without using spotify's api
+const fetch = require('isomorphic-unfetch')
+//const { getData, getPreview, getTracks, getDetails } = require('spotify-url-info')(fetch)
+
 //const publicUrl = 'http://localhost:8888/callback'
 const publicUrl = 'http://spotifyvideo-production.up.railway.app/callback'
 const frontUrl = 'https://spotify-video.vercel.app/'
 //const frontUrl = 'http://localhost:3000'
-var redirect_uri = publicUrl; // Your redirect uri
+
 
 const youtube = require("youtube-search-api");
 const videoIds = new Map();
 
+
+//https://open.spotify.com/user/sean.moran1701/playlists
+//getData('https://open.spotify.com/playlist/6ebiRKzdykeea2oeaj7204')
+//    .then(data => console.log(data))
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
+
+
+
 async function getID(search) {
     var Id = "";
     await youtube.GetListByKeyword(search, true, 1, [{ type: "video" }])
@@ -52,7 +63,7 @@ async function getID(search) {
     return Id;
 }
 
-var generateRandomString = function(length) {
+/*var generateRandomString = function(length) {
   var text = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -62,13 +73,31 @@ var generateRandomString = function(length) {
   return text;
 };
 
-var stateKey = 'spotify_auth_state';
+var stateKey = 'spotify_auth_state';*/
 
 var app = express();
 
-app.use(express.static(__dirname + '/public'))
-   .use(cors())
-   .use(cookieParser());
+
+// Define a list of allowed origins
+const allowedOrigins = ['http://localhost:3000', 'https://ucreate-ai.vercel.app/'];
+
+// Define CORS options
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+};
+
+//set CORS options
+app.use(cors());
+
+//app.use(express.static(__dirname + '/public'))
+//   .use(cors())
+//   .use(cookieParser());
 
 
 var jsonParser = bodyParser.json()
@@ -114,7 +143,7 @@ app.get('/getID', jsonParser, async function (req, res) {
 });
 
 
-app.get('/login', function(req, res) {
+/*app.get('/login', function(req, res) {
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
@@ -215,7 +244,7 @@ app.get('/refresh_token', function(req, res) {
       });
     }
   });
-});
+});*/
 
 const port = process.env.PORT || 8888;
 app.listen(port, "0.0.0.0", () => { console.log(port) })

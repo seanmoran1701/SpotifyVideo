@@ -14,8 +14,10 @@ import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import RepeatOnIcon from '@mui/icons-material/RepeatOn';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 
-const spotifyApi = new SpotifyWebApi();
+//const spotifyApi = new SpotifyWebApi();
 var currentVideo = 0;
 var isFirstVideo = 1;
 var currentPlaylistSize = 0;
@@ -25,7 +27,7 @@ const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
 var targetPlayer;
-
+var username = "";
 
 /*const getToken = () => {
     return window.loaction.hash
@@ -38,7 +40,8 @@ var targetPlayer;
         }, {});
 
 };*/
-
+//const scraperUrl = 'http://localhost:4444';
+const scraperUrl = 'https://spotscraper-production.up.railway.app';
 //const publicUrl = 'http://localhost:8888';
 const publicUrl = 'https://spotifyvideo-production.up.railway.app';
 function App() {
@@ -49,9 +52,11 @@ function App() {
     const [songs, setSongs] = useState([]);
     const [firstLoaded, setFirstLoaded] = useState([]);
     const [repeat, setRepeat] = useState(false);
+    const [isLoading, setisLoading] = useState(false);
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
-        
+
         if (window.location.hash) {
             const hash = window.location.hash;
             const list = hash.split('&');
@@ -68,18 +73,67 @@ function App() {
             }
         }
     })
-    function getPlaylists() {
+    async function setSpotifyPlaylist(playlist) {
+        var requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playlist: playlist})
+        };
+        await fetch(scraperUrl + '/setPlaylist', requestOptions)
+            .then(response => console.log("Playlist set in backend"))
+            .catch(error => console.error('Error fetching data:', error));
+    }
+    async function getSpotifyPlaylists(user) {
+        var requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'user-agent': 'sean.moran1701' },
+
+        };
+
+        await fetch(scraperUrl + '/getPlaylists', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                setPlaylists(data);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    async function getSpotifySongs(user) {
+        var playlistSongs;
+        var requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'user-agent': 'sean.moran1701' },
+
+        };
+
+        await fetch(scraperUrl + '/getSongs', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                playlistSongs = data;
+                currentPlaylistSize = playlistSongs.length;
+                console.log(playlistSongs);
+                setSongs(playlistSongs);
+                //console.log(playlistSongs[currentVideo].track.name);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        return playlistSongs;
+    }
+    async function getPlaylists() {
+        setisLoading(true);
         setplaylistClick(false);
         idFound = 0;
         setRepeat(false);
-
-        spotifyApi.getUserPlaylists({offset: 0, limit: 50 }).then((response) => {
-            setPlaylists(response.items);
-
-
-            console.log(response);
-
-        })
+        
+        if (playlists.length != 0) {
+            setisLoading(false);
+            return;
+        }
+        ///////////////////////////////////////////////////
+        await getSpotifyPlaylists()
+        ////////////////////////////////////////////////////
+        setisLoading(false);
     }
     
     function loadFirstVideo(playlist) {
@@ -91,30 +145,35 @@ function App() {
         console.log('first video loaded');
     }
     async function playListClicked(playlist) {
+        setisLoading(true);
         currentVideo = 0;
         setplaylistClick(true);
         setRepeat(false);
 
-        var playlistSongs;
-        await spotifyApi.getPlaylistTracks(playlist.id).then((response) => {
+
+        console.log(playlist.href);
+        await setSpotifyPlaylist(playlist.href);
+        var playlistSongs = await getSpotifySongs();
+        /////////////////////////////
+        /*await spotifyApi.getPlaylistTracks(playlist.id).then((response) => {
             
             playlistSongs = response.items;
             currentPlaylistSize = playlistSongs.length;
             console.log(response);
             setSongs(playlistSongs);
             console.log(playlistSongs[currentVideo].track.name);
-        })
+        })*/
         console.log('get video function');
+        ////////////////////////////////////
         getVideo(playlistSongs);
-        
+        setisLoading(false);
     }
     async function getVideo(playlistSongs) {
-        var artists = "";
-        for (let i = 0; i < playlistSongs[currentVideo].track.artists.length; i++) {
-            artists = artists + playlistSongs[currentVideo].track.artists[i].name + ' ';    
-        }
-        console.log(artists);
-        var searchString = playlistSongs[currentVideo].track.name + ' ' + artists + 'music video';
+        console.log(playlistSongs);
+        var artists = playlistSongs[currentVideo].artists;
+        
+        console.log(playlistSongs[currentVideo].artists);
+        var searchString = playlistSongs[currentVideo].name + ' ' + artists + 'music video';
         var requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -154,6 +213,12 @@ function App() {
         console.log("Toggle repeat: ", repeat)
 
     }, [repeat])
+
+    useEffect(() => {
+
+        console.log("Toggle loading: ", isLoading)
+
+    }, [isLoading])
 
 
     //youtube video options
@@ -236,7 +301,26 @@ function App() {
         
         if (!repeat) { setRepeat(true); }
         else { setRepeat(false); }
-}
+    }
+
+    async function submitUsername() {
+        console.log(username);
+        var requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username })
+        };
+        await fetch(scraperUrl + '/setUser', requestOptions)
+            .then(response => console.log("login"))
+            .catch(error => console.error('Error fetching data:', error));
+
+        setLoggedIn(true);
+    }
+
+    const handleTextFieldChange = e => {
+        setUsername(e.target.value);
+     
+    }
 //Components
 //-----------------------------------------------------------------------------
     const videoPlayer = <YouTube videoId={videoUrl} opts={opts} onReady={_onReady} onEnd={_onEnd} />;
@@ -265,10 +349,12 @@ function App() {
     return (
         <div className="App">
             
-            {!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}
-
+            {/*{!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}*/}
+            {!loggedIn && <TextField id="standard-basic" label="Spotify Username" variant="standard" value={username} onChange={handleTextFieldChange}/>}
+            {!loggedIn && <Button onClick={() => submitUsername()} variant="contained">SUBMIT</Button>}
             <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
                 {loggedIn && <button onClick={() => getPlaylists()}>GET PLAYLISTS</button>}
+                {isLoading && <CircularProgress />}
             </div>
 
             {playlists && !playlistClick &&
@@ -279,8 +365,8 @@ function App() {
                             return (
                                 <button onClick={() => loadFirstVideo(playlist)}>
                                     <Card>
-                                        {playlist.images[0] &&
-                                            < Card.Img src={playlist.images[0].url} />
+                                        {playlist.image &&
+                                            < Card.Img src={playlist.images} />
                                         }
                                         <Card.Body>
                                             <Card.Title>{playlist.name}</Card.Title>
