@@ -68,7 +68,7 @@ function App() {
 
             if (spotifyToken) {
                 //setSpotifyToken(spotifyToken);
-                spotifyApi.setAccessToken(spotifyToken);
+                //spotifyApi.setAccessToken(spotifyToken);
                 setLoggedIn(true);
             }
         }
