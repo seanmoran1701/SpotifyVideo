@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import SpotifyWebApi from "spotify-web-api-js"
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Container, InputGroup, FormControl, Button, Row, Card } from 'react-bootstrap';
+import { Container, InputGroup, FormControl, Row, Card } from 'react-bootstrap';
 import YouTube from 'react-youtube';
 import './App.css';
 
@@ -16,6 +16,8 @@ import RepeatIcon from '@mui/icons-material/Repeat';
 import RepeatOnIcon from '@mui/icons-material/RepeatOn';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
 //const spotifyApi = new SpotifyWebApi();
 var currentVideo = 0;
@@ -348,15 +350,16 @@ function App() {
 
     return (
         <div className="App">
-            
             {/*{!loggedIn && <a href={publicUrl + '/login'}>Login to Spotify</a>}*/}
-            {!loggedIn && <TextField id="standard-basic" label="Spotify Username" variant="standard" value={username} onChange={handleTextFieldChange}/>}
-            {!loggedIn && <Button onClick={() => submitUsername()} variant="contained">SUBMIT</Button>}
-            <div style={{ float: 'left', marginLeft: 10, marginTop: 10}}>
-                {loggedIn && <button onClick={() => getPlaylists()}>GET PLAYLISTS</button>}
-                {isLoading && <CircularProgress />}
+            <div style={{ marginTop: 10 }}>
+                {!loggedIn && <TextField id="standard-basic" label="Spotify Username" variant="outlined" value={username} onChange={handleTextFieldChange}/>}
+                {!loggedIn && <Button style={{ marginTop: 10, marginLeft: 10}} onClick={() => submitUsername()} variant="contained" >SUBMIT</Button>}
             </div>
-
+            <div style={{ float: 'left', marginLeft: 10, marginTop: 10, marginRight: 10}}>
+                {loggedIn && <Button onClick={() => getPlaylists()} variant="contained">GET PLAYLISTS</Button>}
+                
+            </div>
+            {isLoading && <CircularProgress style={{ position: 'absolute', zIndex: -1, left: 0, right: 0, marginTop: 10,marginLeft: 'auto', marginRight: 'auto'}}></CircularProgress>}
             {playlists && !playlistClick &&
                 <Container>
 
@@ -366,7 +369,7 @@ function App() {
                                 <button onClick={() => loadFirstVideo(playlist)}>
                                     <Card>
                                         {playlist.image &&
-                                            < Card.Img src={playlist.images} />
+                                            < Card.Img src={playlist.image} />
                                         }
                                         <Card.Body>
                                             <Card.Title>{playlist.name}</Card.Title>
